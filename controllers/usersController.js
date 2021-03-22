@@ -36,8 +36,7 @@ router.post('/register', async (req, res) =>{
             county: req.body.county
         })
         await newUser.save()
-
-        res.json({newUser})
+ 
 
         const payload = {
             email: newUser.email,
@@ -48,6 +47,7 @@ router.post('/register', async (req, res) =>{
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: 60 * 60 })
+
         res.json({token})
 
     } catch (error) {
@@ -58,14 +58,14 @@ router.post('/register', async (req, res) =>{
 router.post('/login', async (req, res) =>{
     try {
         const foundUser = await User.findOne({
-            email: req.body.email
+            username: req.body.username
         })
         if(!foundUser) return res.status(400).json({msg: noLoginMessage})
 
         const matchPassword = await bcrypt.compare(req.body.password, foundUser.password)
 
         const payload = {
-            name: foundUser.name,
+            username: foundUser.username,
             email: foundUser.email,
             id: foundUser.id
         }
