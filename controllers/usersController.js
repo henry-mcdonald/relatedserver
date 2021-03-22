@@ -58,14 +58,14 @@ router.post('/register', async (req, res) =>{
 router.post('/login', async (req, res) =>{
     try {
         const foundUser = await User.findOne({
-            email: req.body.email
+            username: req.body.username
         })
         if(!foundUser) return res.status(400).json({msg: noLoginMessage})
 
         const matchPassword = await bcrypt.compare(req.body.password, foundUser.password)
 
         const payload = {
-            name: foundUser.name,
+            username: foundUser.username,
             email: foundUser.email,
             id: foundUser.id
         }
