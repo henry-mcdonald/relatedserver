@@ -1,5 +1,5 @@
 //seed DB with sampler data 
-
+const bcrypt = require('bcryptjs')
 const faker = require('faker')
 require('./models')
 
@@ -30,8 +30,14 @@ const conditions = ["Cystic Fibrosis", "Paralysis", "Cerebral Palsy", "Autism",
 const zips = [60657, 60613, 60614] // list of sample zips
 const relations = ["self", "mother", "father", "caregiver", "brother"]
 
+// perform round of hashing
+const saltRounds = 12
 
-
+let hashedPassword
+async function setHashedPassword() {
+    hashedPassword = await bcrypt.hash("a", saltRounds)
+}
+setHashedPassword()
 //return single fake zip
 function createFakeZip() {
     const randomZip = zips[Math.floor(Math.random() * zips.length)]
@@ -92,7 +98,7 @@ async function createSomeUsers(n_records) {
         const record = await User.create({
             email: faker.internet.email(),
             username: faker.name.firstName(),
-            password: faker.internet.password(),
+            password: hashedPassword,
             relation: createFakeRelation(),
             topics_of_interest: createFakeTopics(),
             disability_tags: createFakeConditions(),
@@ -193,7 +199,7 @@ async function createSomeComments(n_records) {
 }
 
 
-async function seedFullDatabase(){
+async function seedFullDatabase() {
     await clearCollections()
     await createSomeUsers()
     await createSomePosts()
