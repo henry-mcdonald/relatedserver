@@ -1,0 +1,14 @@
+
+1. In index.js:  do we need a callback of "err" in db.on function to track bugs?
+
+2. Do we need to include 'auth-locked' in our routes?
+    
+    2.1 Does the Client end have to unencryped the JWT every time that 
+        an event takes place in the front?  Or once the user is logged in
+        the JWT token is decryped and once the user CRUDs into the database
+        its already authenticated and therefore no longer needing to decode
+        the JWT token.
+
+
+3.  Issue with .env file:  Do we have to add it back everytime we push/pull to 
+    github?  

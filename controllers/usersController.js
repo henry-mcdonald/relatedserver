@@ -37,6 +37,8 @@ router.post('/register', async (req, res) =>{
         })
         await newUser.save()
 
+        res.json({newUser})
+
         const payload = {
             email: newUser.email,
             username: newUser.username,
