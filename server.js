@@ -5,6 +5,7 @@ const morgan = require('morgan')
 const cors = require('cors')
 require('dotenv').config()
 const usersController = require('./controllers/usersController')
+require('./models')
 
 //PORT ACTIVATION
 const app = express()
