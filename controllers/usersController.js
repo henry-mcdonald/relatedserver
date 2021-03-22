@@ -52,6 +52,7 @@ router.post('/register', async (req, res) =>{
 
     } catch (error) {
         console.log(error)
+        res.status(500).json({ msg: '🔥 OH NO server error on register route' })
     }
 })
 
@@ -71,12 +72,12 @@ router.post('/login', async (req, res) =>{
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 60 })
-        res.json({ token })
-    } catch (error) {
-        console.error
-    }
+        res.json({token})
 
-    res.json({ status: 'User successfully logged in'})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ msg: '🔥 OH NO server error on login route' })
+    }
 
 })
 
