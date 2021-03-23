@@ -58,9 +58,14 @@ router.post('/login', async (req, res) =>{
         const foundUser = await User.findOne({
             username: req.body.username
         })
+
+        const noLoginMessage = 'Incorrect username or password'
+        
         if(!foundUser) return res.status(400).json({msg: noLoginMessage})
 
         const matchPassword = await bcrypt.compare(req.body.password, foundUser.password)
+        
+        if(!matchPassword) return res.status(400).json({ msg: noLoginMessage})
 
         const payload = {
             username: foundUser.username,
