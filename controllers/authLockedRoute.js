@@ -4,10 +4,14 @@ const User = require('../models/User.js')
 
 const authLockedRoute = async (req, res, next) =>{
     try {
-   
+
+        // console.log(req.headers.authorization)
+
         const authHeader = req.headers.authorization
         const decode = jwt.verify(authHeader, process.env.JWT_SECRET)
         const foundUser = await User.findById(decode.id)
+        
+        // console.log(authHeader, decode, foundUser)
 
         res.locals.user = foundUser
         next()
