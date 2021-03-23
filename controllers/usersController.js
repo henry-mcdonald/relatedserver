@@ -84,14 +84,24 @@ router.get('/auth-locked/news-feed', authLockedRoute, async (req,res) => {
         
 })
 
-router.get('/auth-locked/profile', authLockedRoute, async (req, res) =>{
+router.get('/profile', authLockedRoute, async (req, res) =>{
 
     const userInfo = await User.findOne({
         id: res.locals.user.id
     })
 
-    res.json( { userInfo: userInfo } )
+    res.json( { about_me: userInfo.about_me } )
 })
+
+router.get('/:userId', authLockedRoute, async(req,res) => {
+    const userId = req.params.userId
+    const userFind = User.findById(userId)
+    if(userFind){
+        res.json()
+    }
+})
+
+router.put('profile')
 
 
 module.exports = router
