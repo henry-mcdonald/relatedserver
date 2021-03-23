@@ -11,17 +11,17 @@ let disabilityTags = [];
 router.post('/register', async (req, res) =>{
     try {
 
-        const findUser = await User.findOne({
-            email: req.body.email
-        })
+        // const findUser = await User.findOne({
+        //     email: req.body.email
+        // })
 
-        if(findUser) return res.json({error: 'Email Already exists'})
+        // if(findUser) return res.json({error: 'Email Already exists'})
         
-        const findUserName = await User.findOne({
-            username: req.body.username,
-        })
+        // const findUserName = await User.findOne({
+        //     username: req.body.username,
+        // })
 
-        if(findUserName) return res.json({ error: 'Choose a different username'})
+        // if(findUserName) return res.json({ error: 'Choose a different username'})
 
         const password = req.body.password
         const saltRounds = 12
@@ -36,7 +36,8 @@ router.post('/register', async (req, res) =>{
             county: req.body.county
         })
         await newUser.save()
- 
+        
+        // res.json({newUser})
 
         const payload = {
             email: newUser.email,
@@ -47,11 +48,11 @@ router.post('/register', async (req, res) =>{
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: 60 * 60 })
-
-        res.json({token})
+        res.json({ token })
 
     } catch (error) {
         console.log(error)
+        res.status(500).json({ msg: '🔥 OH NO server error on register route' })
     }
 })
 
@@ -71,12 +72,12 @@ router.post('/login', async (req, res) =>{
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 60 })
-        res.json({ token })
-    } catch (error) {
-        console.error
-    }
+        res.json({token})
 
-    res.json({ status: 'User successfully logged in'})
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ msg: '🔥 OH NO server error on login route' })
+    }
 
 })
 
