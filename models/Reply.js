@@ -15,7 +15,7 @@ const replySchema = new mongoose.Schema({
     }],
     comment: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'UserComment'
+        ref: 'Comment'
     }
 })
 

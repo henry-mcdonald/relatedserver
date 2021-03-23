@@ -37,6 +37,11 @@ const userSchema = new mongoose.Schema({
     },
     county: {
         type: String
+    },
+    about_me:
+    {
+        type:String,
+        default: ""
     }
 },{
     timestamps: true
