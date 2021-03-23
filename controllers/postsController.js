@@ -30,11 +30,15 @@ router.get('/', authLockedRoute, async (req, res) =>{
                     path: 'comments',
                         populate: {
                             path: 'replies',
-                            select: ['content']
+                            populate: {
+                                path: 'user',
+                                select:'username'
+                            }
                         }
                 })
 
 
+        // console.log(typeof findPosts)
         res.json({ findPosts: findPosts  })
 
         
