@@ -1,9 +1,9 @@
 const mongoose =  require('mongoose')
 
 
-const commentSchema = new mongoose.Schema({
+const replySchema = new mongoose.Schema({
     content: {
-        type: String
+        type: String,  
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
@@ -13,17 +13,12 @@ const commentSchema = new mongoose.Schema({
         type:mongoose.Schema.Types.ObjectId,
         ref: 'User'
     }],
-    replies:  [{
-        type:mongoose.Schema.Types.ObjectId,
-        ref: 'Reply'
-    }],
-    post: {
+    comment: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Post'
+        ref: 'UserComment'
     }
-},{
-    timestamps: true
 })
 
-const Reply = mongoose.model('Comment', commentSchema)
+const Reply = mongoose.model('Reply', replySchema)
+
 module.exports = Reply

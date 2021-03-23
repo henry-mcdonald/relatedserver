@@ -5,9 +5,8 @@ require('./models')
 
 const User = require('./models/User')
 const Post = require('./models/Post')
-const Comment = require('./models/Comment').Comment
-const Reply = require('./models/Comment').Reply
-
+const Comment = require('./models/Comment')
+const Reply = require('./models/Reply')
 
 // clear tables so that every 
 async function clearCollections() {
@@ -111,20 +110,20 @@ async function createSomeUsers(n_records) {
 }
 // createSomeUsers();
 
-async function findARandomUserId() {
+async function findARandomUser() {
     // const count = await User.count()
     // console.log(count)
     randomUser = await User.aggregate([{ $match: {} }, { $sample: { size: 1 } }])
-    return randomUser[0]._id
+    return randomUser[0]
 
 }
 
-async function findSomeRandomUserIds() {
+async function findSomeRandomUsers() {
     const maxNumberWhoLiked = 10
     const numberWhoDidLike = Math.floor(Math.random() * maxNumberWhoLiked)
     const idArray = []
     for (let i = 0; i < numberWhoDidLike; i++) {
-        newCandidate = await findARandomUserId()
+        const newCandidate = await findARandomUser()
         if (!idArray.includes(newCandidate)) {
             idArray.push(newCandidate)
         }
@@ -132,82 +131,112 @@ async function findSomeRandomUserIds() {
     return idArray
 }
 
-async function findARandomPostId() {
-    const randomPost = await Post.aggregate([{ $match: {} }, { $sample: { size: 1 } }])
-    return randomPost[0]._id
+async function findARandomReply(){
+    randomReply = await Reply.aggregate([{ $match: {} }, { $sample: { size: 1 } }])
+    return randomReply[0]._id
 }
 
-
-
-async function createSomePosts(n_records) {
-    if (!n_records) {
-        n_records = 20 //default to create 20 dummy posts
+async function findSomeRandomReplies(){
+    const maxNumberWhoReplied = 3
+    const numberWhoReplied = Math.floor(Math.random()*maxNumberWhoReplied)
+    const idArray = []
+    for(let i= 0; i< numberWhoReplied; i++){
+        const newCandidate = await findARandomReply()
+        if(!idArray.includes(newCandidate)) {
+            idArray.push(newCandidate)
+        }
     }
-
-    for (let i = 0; i < n_records; i++) {
-        let userId = await findARandomUserId()
-        let usersIdsWhoLiked = await findSomeRandomUserIds()
-
-
-        const makePost = await Post.create({
-            discussion_tags: createFakeTopics(),
-            content: faker.lorem.paragraph(Math.floor(Math.random() * 5)),
-            user_id: userId,
-            users_who_liked: usersIdsWhoLiked
-
-        })
-        console.log(makePost)
-    }
+    return idArray
 }
 
-async function createSomeComments(n_records) {
-    if (!n_records) {
-        n_records = 30
-    }
+async function findARandomComment() {
+    randomComment = await Comment.aggregate([{ $match: {} }, { $sample: { size: 1 } }])
+    return randomComment[0]._id
+}
 
-    for (let i = 0; i < n_records; i++) {
-        const userId = await findARandomUserId()
-        const usersIdsWhoLikedComment = await findSomeRandomUserIds()
-        const postIdToCommentOn = await findARandomPostId()
-        const n_replies_to_make = Math.floor(Math.random() * 3)
-
-        const sampleReplies = []
-        for (let i = 0; i < n_replies_to_make; i++) {
-            const userIdWhoMadeReply = await findARandomUserId()
-            const userIdsWhoLikedReply = await findSomeRandomUserIds()
-            const sampleReply = await Reply.create({
-                content: faker.lorem.sentences(Math.floor(Math.random() * 2)),
-                user_id: userIdWhoMadeReply,
-                users_who_liked: userIdsWhoLikedReply
-
-            })
-            sampleReplies.push(sampleReply)
+async function findSomeRandomComments(){
+    const maxNumberWhoCommented = 5
+    const numberWhoCommented = Math.floor(Math.random()*maxNumberWhoCommented)
+    const idArray = []
+    for(let i = 0; i < numberWhoCommented; i++){
+        const newCandidate = await findARandomComment()
+        if(!idArray.includes(newCandidate)){
+            idArray.push(newCandidate)
         }
 
-        console.log(sampleReplies)
+    }
+    return idArray
+}
 
 
 
-        const makeComment = await Comment.create({
-            post_id: postIdToCommentOn,
-            user_id: userId,
-            comment_reply: faker.lorem.sentences(Math.ceil(Math.random() * 3)),
-            replies: sampleReplies
+
+
+async function createSomePosts(n_posts,n_comments,n_replies) {
+    if (!n_posts) {
+        n_posts = 20 //default to create 20 dummy posts
+    }   
+    if (!n_comments) {
+        n_comments = 5 //default to create 20 dummy posts
+    }   
+    if (!n_replies) {
+        n_replies = 2 //default to create 20 dummy posts
+    }   
+    for(let i = 0; i< n_posts; i++){
+        const newPost = await Post.create({
+            discussion_tags: createFakeTopics(),
+            content: faker.lorem.paragraph(Math.floor(Math.random() * 5)),
+            user: await findARandomUser(),
+            users_who_liked: await findSomeRandomUsers(),
+            comments: []
+
         })
-        console.log(makeComment)
+
+        for(let j = 0 ; j< n_comments; j++){
+            const newComment = await Comment.create({
+                content: faker.lorem.sentences(Math.ceil(Math.random() * 3)),
+                user: await findARandomUser(),
+                users_who_liked: await findSomeRandomUsers(),
+                post: newPost._id,
+                replies: []
+            })
+            for(let k =0 ; k<n_replies; k++){
+                
+                const newReply = await Reply.create({
+                    content: faker.lorem.sentences(Math.ceil(Math.random() * 2)),
+                    user: await findARandomUser(),
+                    users_who_liked: await findSomeRandomUsers(),
+                    comment:newComment._id
+                })
+
+                newComment.replies.push(newReply._id)
+                await newComment.save()
+            }
+
+
+            newPost.comments.push(newComment._id)
+            await newPost.save()
+
+        }
+        console.log(newPost)
     }
 }
+
+
 
 
 async function seedFullDatabase() {
     await clearCollections()
     await createSomeUsers()
     await createSomePosts()
-    await createSomeComments()
 }
 seedFullDatabase()
 //findARandomUserId()
 
+
+async function dbTest(){
+
+}
 
 // for(i=0;i<50;i++){
 //     //console.log(createFakeZip())
