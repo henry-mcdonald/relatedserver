@@ -5,23 +5,20 @@ const jwt = require('jsonwebtoken')
 const authLockedRoute = require('./authLockedRoute')
 
 
-let topicsOfInterest = [];
-let disabilityTags = [];
-
 router.post('/register', async (req, res) =>{
     try {
 
-        // const findUser = await User.findOne({
-        //     email: req.body.email
-        // })
+        const findUser = await User.findOne({
+            email: req.body.email
+        })
 
-        // if(findUser) return res.json({error: 'Email Already exists'})
+        if(findUser) return res.json({error: 'Email Already exists'})
         
-        // const findUserName = await User.findOne({
-        //     username: req.body.username,
-        // })
+        const findUserName = await User.findOne({
+            username: req.body.username,
+        })
 
-        // if(findUserName) return res.json({ error: 'Choose a different username'})
+        if(findUserName) return res.json({ error: 'Choose a different username'})
 
         const password = req.body.password
         const saltRounds = 12
@@ -81,6 +78,8 @@ router.post('/login', async (req, res) =>{
 
 })
 
+
+
 router.get('/auth-locked/news-feed', authLockedRoute, async (req,res) => {
         
 })
@@ -90,7 +89,6 @@ router.get('/auth-locked/profile', authLockedRoute, async (req, res) =>{
     const userInfo = await User.findOne({
         id: res.locals.user.id
     })
-
 
     res.json( { userInfo: userInfo } )
 })
