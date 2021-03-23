@@ -1,6 +1,8 @@
 const router = require('express').Router()
 const Post = require('../models/Post.js')
 const User = require('../models/User.js')
+const Comment = require('../models/Comment.js')
+const Reply = require('../models/Reply.js')
 const authLockedRoute = require('./authLockedRoute')
 
 
@@ -12,39 +14,26 @@ router.get('/', authLockedRoute, async (req, res) =>{
     let usersLiked = null
     try {
 
-        const findPosts = await Post.find({})
-       
-        async function addPostData () {
+        const findPosts = await Post.find().populate({
+            path: 'user', 
+            select: 'username'
+            }).populate({
+                path: "comments",
+                select: "content"
+                }).populate({
+                    path: "comments",
+                        populate: {
+                            path: 'user',
+                            select: 'username'
+                        }
+                }).populate({
+                    path: 'comments',
+                        populate: {
+                            path: 'replies',
+                            select: ['content','user']
+                        }
+                })
 
-
-            for(i=0; i < findPosts.length; i++ ){
-                user = await User.findById(
-                findPosts[i].user_id
-                )
-            }
-            
-            console.log(user)
-            
-            
-            // usersname = user.username
-            // postData.push(usersname)
-            // postData.push(post.content)
-
-            // for(const post of findPosts) {
-                //     user = await User.findById({
-            //         id: post.user_id
-            //     })
-            // }
-            // findPosts.forEach(async post => {
-            //    user = await User.findById({
-            //        id: post.user_id
-            //    })
-            // })
-
-        }
-        addPostData();
-
-        // console.log(postData)
 
         res.json({ findPosts: findPosts  })
 
@@ -55,5 +44,37 @@ router.get('/', authLockedRoute, async (req, res) =>{
     }
     
 })
+
+router.post('/', authLockedRoute, async (req, res) =>{
+    try {
+
+        let topics = ["Wheelchair Accessability", "Community Events",
+        "Local Meetups", "Awareness"]
+
+        const user = res.locals.user
+
+        const createPost  = await Post.create({
+            content: req.body.content,
+            user_id: user.id,
+            discussion_tags: [],
+            users_who_liked: [],
+
+        })
+        
+        console.log(createPost)
+
+        res.json({ createPost: createPost })
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json( {msg: "Posting a Post failed"} )  
+    }
+
+    
+}) 
+
+
+
+
 
 module.exports = router
