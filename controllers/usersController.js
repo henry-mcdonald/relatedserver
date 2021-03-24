@@ -123,8 +123,13 @@ router.post('/profile', authLockedRoute, async(req,res) => { // have to authlock
         if(userInfo){
             userInfo.about_me = req.body.edited_profile
             await userInfo.save()
-            console.log(userInfo)
-            res.json({success: "Profile has been updated"})
+            res.json({                 
+                username: userInfo.username,
+                about_user: userInfo.about_me,
+                relation: userInfo.relation,
+                topics_of_interest: userInfo.topics_of_interest,
+                email: userInfo.email
+            })
         } else{
             res.json({msg: "user not found"})
         }

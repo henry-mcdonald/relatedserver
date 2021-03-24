@@ -231,8 +231,31 @@ router.put('/:postId/edit-post', authLockedRoute, async (req, res)=>{
            
     } catch (error) {
         console.log(error)
+        res.status(500).json({error: "cannot edit post. Error occured"})
     }
 })
+
+//Delete a post
+router.delete('/:postId/delete-post', authLockedRoute, async (req, res)=>{
+    try {
+        const userId = res.locals.user.id
+        const findPost = await Post.findById(req.params.postId)
+        const postAuthorId = findPost.user._id.toString()
+
+        if(postAuthorId === userId){
+            const deletePost = await Post.findByIdAndDelete({
+                _id: req.params.postId
+            })
+            res.json(deletePost)
+        }else{
+            res.json({msg: "You cannot delete someone else's post!"})
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error: "cannot delete Post.  Error occured."})
+    }
+})
+
 
 
 module.exports = router
