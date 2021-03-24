@@ -62,7 +62,7 @@ router.post('/', authLockedRoute, async (req, res) =>{
             user_id: user.id,
             discussion_tags: [],
             users_who_liked: [],
-
+            comments:[],
         })
         
         console.log(createPost)
@@ -73,11 +73,8 @@ router.post('/', authLockedRoute, async (req, res) =>{
         console.log(error)
         res.status(500).json( {msg: "Posting a Post failed"} )  
     }
-
     
 }) 
-
-
 
 
 
