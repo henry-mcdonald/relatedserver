@@ -75,7 +75,7 @@ router.post('/login', async (req, res) => {
             id: foundUser.id
         }
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 60 })
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 600000000 })
         res.json({ token })
 
     } catch (error) {
