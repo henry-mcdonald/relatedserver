@@ -5,25 +5,27 @@ const jwt = require('jsonwebtoken')
 const authLockedRoute = require('./authLockedRoute')
 
 
-router.post('/register', async (req, res) =>{
+router.post('/register', async (req, res) => {
     try {
 
         const findUser = await User.findOne({
             email: req.body.email
         })
 
-        if(findUser) return res.json({error: 'Email Already exists'})
-        
+        if (findUser) return res.json({ error: 'Email Already exists' })
+
         const findUserName = await User.findOne({
             username: req.body.username,
         })
 
+
         if(findUserName) return res.json({ error: 'Choose a different username' })
+
 
         const password = req.body.password
         const saltRounds = 12
         const hashedPassword = await bcrypt.hash(password, saltRounds)
-        
+
 
         const newUser = new User({
             email: req.body.email,
@@ -33,7 +35,7 @@ router.post('/register', async (req, res) =>{
             county: req.body.county
         })
         await newUser.save()
-        
+
         // res.json({newUser})
 
         const payload = {
@@ -44,7 +46,7 @@ router.post('/register', async (req, res) =>{
             id: newUser.id,
         }
 
-        const token = jwt.sign(payload, process.env.JWT_SECRET, {expiresIn: 60 * 60 })
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 60 })
         res.json({ token })
 
     } catch (error) {
@@ -53,7 +55,7 @@ router.post('/register', async (req, res) =>{
     }
 })
 
-router.post('/login', async (req, res) =>{
+router.post('/login', async (req, res) => {
     try {
         const foundUser = await User.findOne({
             username: req.body.username
@@ -74,7 +76,7 @@ router.post('/login', async (req, res) =>{
         }
 
         const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: 60 * 60 })
-        res.json({token})
+        res.json({ token })
 
     } catch (error) {
         console.log(error)
@@ -85,28 +87,79 @@ router.post('/login', async (req, res) =>{
 
 
 
-router.get('/auth-locked/news-feed', authLockedRoute, async (req,res) => {
-        
+router.get('/auth-locked/news-feed', authLockedRoute, async (req, res) => {
+
 })
 
-router.get('/profile', authLockedRoute, async (req, res) =>{
+router.get('/profile', authLockedRoute, async (req, res) => {
+    try {
+        console.log(res.locals.user.id)
+        const userInfo = await User.findById(res.locals.user.id)
 
-    const userInfo = await User.findOne({
-        id: res.locals.user.id
-    })
+        if (userInfo) {
+            res.json({                 
+                username: userInfo.username,
+                about_user: userInfo.about_me,
+                relation: userInfo.relation,
+                topics_of_interest: userInfo.topics_of_interest
+            })
+        } else {
+            res.json({ about_me: "not found. Are you logged in??" })
+        }
+    } catch(error) {
+        console.log(error)
+        res.status(500).json({ msg: '🔥 OH NO server error on get profile route' })
 
-    res.json( { about_me: userInfo.about_me } )
+    }
+
 })
 
-router.get('/:userId', authLockedRoute, async(req,res) => {
-    const userId = req.params.userId
-    const userFind = User.findById(userId)
-    if(userFind){
-        res.json()
+router.post('/profile', authLockedRoute, async(req,res) => { // have to authlock
+    try{
+
+        const userInfo = await User.findById(res.locals.user.id)
+
+        if(userInfo){
+            userInfo.about_me = req.body.edited_profile
+            await userInfo.save()
+            console.log(userInfo)
+            res.json({success: "Profile has been updated"})
+        } else{
+            res.json({msg: "user not found"})
+        }
+
+    } catch(error){
+        console.log(error)
+        res.status(500).json({ msg: '🔥 OH NO server error on put profile route' })
     }
 })
 
-router.put('profile')
+
+router.get('/:userId', authLockedRoute, async (req, res) => {
+
+    try {
+        const userId = req.params.userId
+        const userFind = await User.findById(userId)
+        if (userFind) {
+            res.json({
+                username: userFind.username,
+                about_user: userFind.about_me,
+                relation: userFind.relation,
+                topics_of_interest: userFind.topics_of_interest
+            })
+        } else {
+
+            res.json({ about_user: "user not found" })
+
+        }
+
+    } catch(error){
+        console.log(error)
+        res.status(500).json({ msg: '🔥 OH NO server error on get userId route' })
+
+    }
+})
+
 
 
 module.exports = router
