@@ -73,42 +73,42 @@ router.get('/:postId', authLockedRoute, async (req, res) => {
         const findPost = await Post.findById(req.params.postId).populate({
             path: 'user', 
             select: 'username'
-        }).populate({
-            path: "comments",
-            select: "content"
-        }).populate({
-            path: "users_who_liked",
-            select: "username"
-        }).populate({
-            path: "comments",
-            populate: {
-                path: 'user',
-                select: 'username'
-            }
-        }).populate({
-            path: "comments",
-            populate: {
-                path: 'users_who_liked',
-                select: 'username'
-            }
-        }).populate({
-            path: 'comments',
-            populate: {
-                path: 'replies',
-                populate: {
-                        path: 'user',
-                        select:'username'
-                    }
-                }
-            }).populate({
-                path: 'comments',
-                populate: {
-                    path: 'replies',
-                    populate: {
-                            path: 'users_who_liked',
-                            select:'username'
-                        }
-                    }
+        // }).populate({
+        //     path: "comments",
+        //     select: "content"
+        // }).populate({
+        //     path: "users_who_liked",
+        //     select: "username"
+        // }).populate({
+        //     path: "comments",
+        //     populate: {
+        //         path: 'user',
+        //         select: 'username'
+        //     }
+        // }).populate({
+        //     path: "comments",
+        //     populate: {
+        //         path: 'users_who_liked',
+        //         select: 'username'
+        //     }
+        // }).populate({
+        //     path: 'comments',
+        //     populate: {
+        //         path: 'replies',
+        //         populate: {
+        //                 path: 'user',
+        //                 select:'username'
+        //             }
+        //         }
+        //     }).populate({
+        //         path: 'comments',
+        //         populate: {
+        //             path: 'replies',
+        //             populate: {
+        //                     path: 'users_who_liked',
+        //                     select:'username'
+        //                 }
+        //             }
                 })
             
             console.log(findPost)
@@ -186,16 +186,28 @@ router.post('/:postId/add-comment', authLockedRoute, async (req, res) =>{
 router.post('/:postId/like-the-post', authLockedRoute, async (req, res) =>{
     try {
 
+
+        
         const userId = res.locals.user.id
         const findPost = await Post.findById(req.params.postId).populate({
-            path: "users_who_liked",
-            select: "username"
+            path: 'users_who_liked',
+            select: 'username'
         })
-        findPost.users_who_liked.push(userId)
-        await findPost.save()
+        // if(findPost.users_who_liked === userId){
+        //     await findPost.users_who_liked.deleteOne({
+        //         id: userId
+        //     })
+        // }else{
+        //     findPost.users_who_liked.push(userId)
+        //     await findPost.save()
+        // }
 
-        console.log(findPost)
-
+        const findIds = findPost.users_who_liked.map(id =>{
+            id._id
+        })
+        
+        console.log("💀", findIds)
+        
         res.json({findPost: findPost})
 
     } catch (error) {
