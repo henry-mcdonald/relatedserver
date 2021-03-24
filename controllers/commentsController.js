@@ -16,7 +16,9 @@ router.post('/:commentId/add-reply', authLockedRoute, async (req, res) =>{
             user: userId
         })
         reply.save()
-        const findComment = await Comment.findById(req.params.commentId).populate({
+        const findComment = await Comment.findById(
+        {_id: req.params.commentId}, {new: true}
+        ).populate({
             path:'replies',
             select: "content"
         }).populate({
