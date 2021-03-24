@@ -6,6 +6,8 @@ const Reply = require('../models/Reply.js')
 const authLockedRoute = require('./authLockedRoute')
 
 
+
+//Replying to a comment
 router.post('/:commentId/add-reply', authLockedRoute, async (req, res) =>{
     try {
         const userId = res.locals.user.id
@@ -31,7 +33,7 @@ router.post('/:commentId/add-reply', authLockedRoute, async (req, res) =>{
 
     } catch (error) {
         console.log(error)
-        res.status(500).json( {msg: "adding a comment failed"} ) 
+        res.status(500).json( {msg: "adding a reply failed"} ) 
     }
 })
 
