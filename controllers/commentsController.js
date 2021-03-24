@@ -17,7 +17,7 @@ router.post('/:commentId/add-reply', authLockedRoute, async (req, res) =>{
         })
         reply.save()
         const findComment = await Comment.findById(
-        {_id: req.params.commentId}, {new: true}
+        {_id: req.params.commentId}
         ).populate({
             path:'replies',
             select: "content"
@@ -39,6 +39,52 @@ router.post('/:commentId/add-reply', authLockedRoute, async (req, res) =>{
     }
 })
 
+//Like a comment
+router.post('/:commentId/like-the-comment', authLockedRoute, async (req, res)=>{
+    try {
+        const userId = res.locals.user.id
+        const findComment = await Comment.findById(req.params.commentId)
+        
+        if(findComment.users_who_liked.includes(userId) === true) {
+            findComment.users_who_liked.pull({_id: userId})
+            await findComment.save()
+        }else{
+            findComment.users_who_liked.push(userId)
+            await findComment.save()
+        }
+        res.json(findComment)
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json( { msg: "liking a comment failed"} )
+    }
+})
+
+//Edit a comment
+router.put('/:commentId/edit-comment', authLockedRoute, async (req, res)=>{
+    try {
+        const userId = res.locals.user.id
+        const findComment = await Comment.findById({
+            _id: req.params.commentId
+        })
+        const commentAuthorId = findComment.user._id.toString()
+
+        if(userId === commentAuthorId){
+            const updateComment = await Comment.findByIdAndUpdate(
+                {_id: req.params.commentId},
+                {$set: {content: req.body.content}},
+                {new: true})
+            res.json(updateComment)
+        }else{
+            res.json({error: "Whoopsie, you're not supposed to change someone else's comment!"})
+        }
+        
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({msg: "editing the comment failed"})
+    }
+})
 
 
 

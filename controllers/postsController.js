@@ -131,7 +131,7 @@ router.post('/', authLockedRoute, async (req, res) =>{
 
         const createPost  = await Post.create({
             content: req.body.content,
-            user_id: user.id,
+            user: user.id,
             discussion_tags: [],
             users_who_liked: [],
             comments:[],
@@ -185,41 +185,19 @@ router.post('/:postId/add-comment', authLockedRoute, async (req, res) =>{
 //like a post 
 router.post('/:postId/like-the-post', authLockedRoute, async (req, res) =>{
     try {
-
-
-        
         const userId = res.locals.user.id
         const findPost = await Post.findById(req.params.postId)
-        // .populate({
-        //     path: 'users_who_liked',
-        //     select: 'username'
-        // })
-        let eachId = []
-        // const likedIds = findPost.users_who_liked
-        //     for(let i=0; i < likedIds.length; i++){
-        //         eachId.push(likedIds[i]._id.toString())
-        //     }
+    
         if(findPost.users_who_liked.includes(userId) === true){
-
             console.log("Its true, it has it.")
-            findPost.update(
-            {},
-            { $pull: { users_who_liked: userId } },
-            { multi: true }
-            )
-            // await findPost.save()
-
+            findPost.users_who_liked.pull({ _id: userId })
+            await findPost.save()
+          
         }else{
             console.log("it does not have it")
             findPost.users_who_liked.push(userId)
             await findPost.save()
         }
-
-        // console.log("these are the ids", eachId)
-        // console.log("this is the user id", userId)
-
-
-        
         res.json({findPost: findPost})
 
     } catch (error) {
@@ -227,5 +205,34 @@ router.post('/:postId/like-the-post', authLockedRoute, async (req, res) =>{
         res.status(500).json( {msg: "adding a comment failed"} )
     }
 })
+
+//Edit a Post
+router.put('/:postId/edit-post', authLockedRoute, async (req, res)=>{
+    try {
+        const userId = res.locals.user.id
+        const findPost = await Post.findById({
+            _id:req.params.postId
+        })
+        const postAuthorId = findPost.user._id.toString()
+        
+        if(userId === postAuthorId){
+            console.log("its matched")
+            const updatePost = await Post.findByIdAndUpdate(
+                    {_id: req.params.postId},
+                    {$set: {content: req.body.content}},
+                    {new: true})
+                res.json(updatePost)
+        }else{
+            console.log("its not matched")
+            res.json({error: "YOU AIN'T ALLOWED TO CHANGE OTHER PEEPS POSTS!"})
+        }
+        console.log(userId, "this is the userId")
+        console.log(postAuthorId, "this is the AuthorId")
+           
+    } catch (error) {
+        console.log(error)
+    }
+})
+
 
 module.exports = router

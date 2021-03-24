@@ -7,6 +7,7 @@ require('dotenv').config()
 const usersController = require('./controllers/usersController')
 const postsController = require('./controllers/postsController')
 const commentsController = require('./controllers/commentsController')
+const repliesController = require('./controllers/repliesController')
 require('./models')
 
 //PORT ACTIVATION
@@ -30,6 +31,7 @@ const middleware = ((req,res, next ) =>{
 app.use('/api-v1/users', usersController)
 app.use('/api-v1/posts', postsController)
 app.use('/api-v1/comments', commentsController)
+app.use('/api-v1/replies', repliesController)
 
 
 //INDEX ROUTES
