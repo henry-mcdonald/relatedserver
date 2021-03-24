@@ -14,12 +14,12 @@ const userSchema = new mongoose.Schema({
     relation: {
         type: String
     },
-    topics_of_interest: {
-        type: Array
-    },
-    disability_tags: {
-        type: Array
-    },
+    topics_of_interest: [{
+        type: String
+    }],
+    disability_tags: [{
+        type: String
+    }],
     // liked_posts: [{
     //     type: mongoose.Schema.Types.ObjectId,
     //     ref: 'Post'
