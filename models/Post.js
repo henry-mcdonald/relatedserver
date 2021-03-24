@@ -2,9 +2,9 @@ const mongoose =  require('mongoose')
 
 
 const postSchema = new mongoose.Schema({
-    discussion_tags: {
-        type: Array
-    },
+    discussion_tags: [{
+        type: String
+    }],
     content: {
         type: String
     },

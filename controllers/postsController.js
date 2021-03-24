@@ -189,24 +189,36 @@ router.post('/:postId/like-the-post', authLockedRoute, async (req, res) =>{
 
         
         const userId = res.locals.user.id
-        const findPost = await Post.findById(req.params.postId).populate({
-            path: 'users_who_liked',
-            select: 'username'
-        })
-        // if(findPost.users_who_liked === userId){
-        //     await findPost.users_who_liked.deleteOne({
-        //         id: userId
-        //     })
-        // }else{
-        //     findPost.users_who_liked.push(userId)
-        //     await findPost.save()
-        // }
+        const findPost = await Post.findById(req.params.postId)
+        // .populate({
+        //     path: 'users_who_liked',
+        //     select: 'username'
+        // })
+        let eachId = []
+        // const likedIds = findPost.users_who_liked
+        //     for(let i=0; i < likedIds.length; i++){
+        //         eachId.push(likedIds[i]._id.toString())
+        //     }
+        if(findPost.users_who_liked.includes(userId) === true){
 
-        const findIds = findPost.users_who_liked.map(id =>{
-            id._id
-        })
-        
-        console.log("💀", findIds)
+            console.log("Its true, it has it.")
+            findPost.update(
+            {},
+            { $pull: { users_who_liked: userId } },
+            { multi: true }
+            )
+            // await findPost.save()
+
+        }else{
+            console.log("it does not have it")
+            findPost.users_who_liked.push(userId)
+            await findPost.save()
+        }
+
+        // console.log("these are the ids", eachId)
+        // console.log("this is the user id", userId)
+
+
         
         res.json({findPost: findPost})
 
