@@ -157,7 +157,9 @@ router.post('/:postId/add-comment', authLockedRoute, async (req, res) =>{
             user: userId
         })
         comment.save()
-        const findPost = await Post.findById(req.params.postId).populate({
+        const findPost = await Post.findById(
+            {_id: req.params.postId}, {new: true}
+            ).populate({
             path: "comments",
             select: "content"
         }).populate({
@@ -171,7 +173,7 @@ router.post('/:postId/add-comment', authLockedRoute, async (req, res) =>{
         await findPost.save()
 
         console.log(findPost)
-        res.json({ findPost: findPost} )
+        res.json( {findPost: findPost} )
 
     } catch (error) {
         console.log(error)
