@@ -101,7 +101,8 @@ router.get('/profile', authLockedRoute, async (req, res) => {
                 username: userInfo.username,
                 about_user: userInfo.about_me,
                 relation: userInfo.relation,
-                topics_of_interest: userInfo.topics_of_interest
+                topics_of_interest: userInfo.topics_of_interest,
+                email: userInfo.email
             })
         } else {
             res.json({ about_me: "not found. Are you logged in??" })
