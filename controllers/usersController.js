@@ -18,7 +18,9 @@ router.post('/register', async (req, res) => {
             username: req.body.username,
         })
 
-        if (findUserName) return res.json({ error: 'Choose a different username' })
+
+        if(findUserName) return res.json({ error: 'Choose a different username' })
+
 
         const password = req.body.password
         const saltRounds = 12
