@@ -5,6 +5,9 @@ const postSchema = new mongoose.Schema({
     discussion_tags: [{
         type: String
     }],
+    title: {
+        type: String
+    },
     content: {
         type: String
     },
@@ -25,7 +28,7 @@ const postSchema = new mongoose.Schema({
     timestamps: true
 })
 
-postSchema.index({content: 'text'})
+postSchema.index({content: 'text'}, {title: 'text'})
 
 const Post = mongoose.model('Post', postSchema)
 

@@ -126,6 +126,7 @@ router.post('/', authLockedRoute, async (req, res) =>{
         const user = res.locals.user
 
         const createPost  = await Post.create({
+            title: req.body.title,
             content: req.body.content,
             user: user.id,
             discussion_tags: [],
@@ -213,11 +214,37 @@ router.put('/:postId/edit-post', authLockedRoute, async (req, res)=>{
         
         if(userId === postAuthorId){
             console.log("its matched")
-            const updatePost = await Post.findByIdAndUpdate(
+
+            //if user wants to only change the TITLE of the post
+            if(!req.body.content){
+                console.log("it hit the change title conditional ")
+                const post = await Post.findById(req.params.postId)
+                const postContent = post.content
+                console.log(postContent)
+                const updatePostContent = await Post.findByIdAndUpdate(
+                        {_id: req.params.postId},
+                        {$set: {title: req.body.title}},
+                        {new: true})
+                    res.json(updatePostContent)
+
+            //if user wants to only change the CONTENT of the post        
+            }else if(!req.body.title){
+                console.log("it hit the change content conditional ")
+                const post = await Post.findById(req.params.postId)
+                const postTitle = post.title
+                console.log(typeof postTitle, "post title content")
+                const updatePostTitle = await Post.findByIdAndUpdate(
                     {_id: req.params.postId},
-                    {$set: {content: req.body.content}},
-                    {new: true})
-                res.json(updatePost)
+                        {$set: {content: req.body.content, title: postTitle}},
+                        {new: true})
+                    res.json(updatePostTitle)   
+            }else{
+                const updatePost = await Post.findByIdAndUpdate(
+                    {_id: req.params.postId},
+                        {$set: {content: req.body.content, title: req.body.title}},
+                        {new: true})
+                    res.json(updatePost)   
+            }
         }else{
             console.log("its not matched")
             res.json({error: "YOU AIN'T ALLOWED TO CHANGE OTHER PEEPS POSTS!"})
