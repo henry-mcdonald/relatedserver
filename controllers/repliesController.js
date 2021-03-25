@@ -50,5 +50,26 @@ router.put('/:replyId/edit-reply', authLockedRoute, async (req, res)=>{
     }
 })
 
+router.delete('/:replyId/delete-reply', authLockedRoute, async (req, res)=>{
+    try {
+        const userId = res.locals.user.id
+        const findReply = await Reply.findById(req.params.replyId)
+        const replyAuthorId = findReply.user._id.toString()
+
+        if(replyAuthorId === userId){
+            const deleteReply = await Reply.findByIdAndDelete({
+                _id: req.params.replyId
+            })
+            res.json(deleteReply)
+        }else{
+            res.json({msg: "ERRRRORRRRR. You can't delete another person's Reply!"})
+        }
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error: "cannot delete Comment.  Error occured."})
+    }
+})
+
+
 
 module.exports = router
