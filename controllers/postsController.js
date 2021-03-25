@@ -134,9 +134,12 @@ router.post('/', authLockedRoute, async (req, res) =>{
             comments:[],
         })
         
-        console.log(createPost)
-
-        res.json({ createPost: createPost })
+        const findPost = await Post.findById(createPost._id).populate({
+            path: 'user',
+            select: 'username'
+        })
+    
+        res.json(findPost)
 
     } catch (error) {
         console.log(error)
