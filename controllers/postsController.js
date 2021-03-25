@@ -6,12 +6,9 @@ const Reply = require('../models/Reply.js')
 const authLockedRoute = require('./authLockedRoute')
 
 
+
 //Get all posts
 router.get('/', authLockedRoute, async (req, res) =>{
-    let postData = {}
-    let user = null
-    let usersname = null
-    let usersLiked = null
     try {
 
         const findPosts = await Post.find().populate({
@@ -67,48 +64,47 @@ router.get('/', authLockedRoute, async (req, res) =>{
 })
 
 //View a single post
-
 router.get('/:postId', authLockedRoute, async (req, res) => {
     try {
         const findPost = await Post.findById(req.params.postId).populate({
             path: 'user', 
             select: 'username'
-        // }).populate({
-        //     path: "comments",
-        //     select: "content"
-        // }).populate({
-        //     path: "users_who_liked",
-        //     select: "username"
-        // }).populate({
-        //     path: "comments",
-        //     populate: {
-        //         path: 'user',
-        //         select: 'username'
-        //     }
-        // }).populate({
-        //     path: "comments",
-        //     populate: {
-        //         path: 'users_who_liked',
-        //         select: 'username'
-        //     }
-        // }).populate({
-        //     path: 'comments',
-        //     populate: {
-        //         path: 'replies',
-        //         populate: {
-        //                 path: 'user',
-        //                 select:'username'
-        //             }
-        //         }
-        //     }).populate({
-        //         path: 'comments',
-        //         populate: {
-        //             path: 'replies',
-        //             populate: {
-        //                     path: 'users_who_liked',
-        //                     select:'username'
-        //                 }
-        //             }
+        }).populate({
+            path: "comments",
+            select: "content"
+        }).populate({
+            path: "users_who_liked",
+            select: "username"
+        }).populate({
+            path: "comments",
+            populate: {
+                path: 'user',
+                select: 'username'
+            }
+        }).populate({
+            path: "comments",
+            populate: {
+                path: 'users_who_liked',
+                select: 'username'
+            }
+        }).populate({
+            path: 'comments',
+            populate: {
+                path: 'replies',
+                populate: {
+                        path: 'user',
+                        select:'username'
+                    }
+                }
+            }).populate({
+                path: 'comments',
+                populate: {
+                    path: 'replies',
+                    populate: {
+                            path: 'users_who_liked',
+                            select:'username'
+                        }
+                    }
                 })
             
             console.log(findPost)
@@ -195,7 +191,7 @@ router.post('/:postId/like-the-post', authLockedRoute, async (req, res) =>{
           
         }else{
             console.log("it does not have it")
-            findPost.users_who_liked.push(userId)
+            findPost.users_who_liked.push({_id: userId})
             await findPost.save()
         }
         res.json({findPost: findPost})
@@ -256,6 +252,23 @@ router.delete('/:postId/delete-post', authLockedRoute, async (req, res)=>{
     }
 })
 
+
+//Search all Post content
+router.get('/find/:query', authLockedRoute, async (req, res) =>{
+    try {
+        const query = req.params.query
+        const queryPost = await Post.find({
+            $text: {
+                $search :query
+            }
+        })
+        res.json(queryPost)    
+         
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({error: "Search Query Failed"})
+    }
+})
 
 
 module.exports = router

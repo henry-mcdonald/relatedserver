@@ -10,6 +10,7 @@ const commentsController = require('./controllers/commentsController')
 const repliesController = require('./controllers/repliesController')
 require('./models')
 
+
 //PORT ACTIVATION
 const app = express()
 const PORT = process.env.PORT || 3001
