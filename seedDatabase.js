@@ -136,36 +136,11 @@ async function findARandomReply(){
     return randomReply[0]._id
 }
 
-async function findSomeRandomReplies(){
-    const maxNumberWhoReplied = 3
-    const numberWhoReplied = Math.floor(Math.random()*maxNumberWhoReplied)
-    const idArray = []
-    for(let i= 0; i< numberWhoReplied; i++){
-        const newCandidate = await findARandomReply()
-        if(!idArray.includes(newCandidate)) {
-            idArray.push(newCandidate)
-        }
-    }
-    return idArray
-}
+
 
 async function findARandomComment() {
     randomComment = await Comment.aggregate([{ $match: {} }, { $sample: { size: 1 } }])
     return randomComment[0]._id
-}
-
-async function findSomeRandomComments(){
-    const maxNumberWhoCommented = 5
-    const numberWhoCommented = Math.floor(Math.random()*maxNumberWhoCommented)
-    const idArray = []
-    for(let i = 0; i < numberWhoCommented; i++){
-        const newCandidate = await findARandomComment()
-        if(!idArray.includes(newCandidate)){
-            idArray.push(newCandidate)
-        }
-
-    }
-    return idArray
 }
 
 
@@ -174,13 +149,13 @@ async function findSomeRandomComments(){
 
 async function createSomePosts(n_posts,n_comments,n_replies) {
     if (!n_posts) {
-        n_posts = 20 //default to create 20 dummy posts
+        n_posts = 21//default to create 20 dummy posts
     }   
     if (!n_comments) {
         n_comments = 5 //default to create 20 dummy posts
     }   
     if (!n_replies) {
-        n_replies = 2 //default to create 20 dummy posts
+        n_replies = 3 //default to create 20 dummy posts
     }   
     for(let i = 0; i< n_posts; i++){
         const newPost = await Post.create({
@@ -192,7 +167,7 @@ async function createSomePosts(n_posts,n_comments,n_replies) {
 
         })
 
-        for(let j = 0 ; j< n_comments; j++){
+        for(let j = 0 ; j< Math.floor(Math.random()*n_comments); j++){
             const newComment = await Comment.create({
                 content: faker.lorem.sentences(Math.ceil(Math.random() * 3)),
                 user: await findARandomUser(),
@@ -200,7 +175,7 @@ async function createSomePosts(n_posts,n_comments,n_replies) {
                 post: newPost._id,
                 replies: []
             })
-            for(let k =0 ; k<n_replies; k++){
+            for(let k =0 ; k<Math.floor(Math.random()*n_replies); k++){
                 
                 const newReply = await Reply.create({
                     content: faker.lorem.sentences(Math.ceil(Math.random() * 2)),

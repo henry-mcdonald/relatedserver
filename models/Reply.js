@@ -17,7 +17,8 @@ const replySchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Comment'
     }
-})
+},
+{timestamps:true})
 
 const Reply = mongoose.model('Reply', replySchema)
 
