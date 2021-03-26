@@ -117,7 +117,6 @@ router.get('/profile', authLockedRoute, async (req, res) => {
 
 router.post('/profile', authLockedRoute, async(req,res) => { // have to authlock
     try{
-
         const userInfo = await User.findById(res.locals.user.id)
 
         if(userInfo){
@@ -163,6 +162,24 @@ router.get('/:userId', authLockedRoute, async (req, res) => {
         console.log(error)
         res.status(500).json({ msg: '🔥 OH NO server error on get userId route' })
 
+    }
+})
+
+//User uploads an image
+
+router.post('/image-upload', authLockedRoute, async (req, res)=>{
+    try {
+        console.log(req,"req")
+        console.log(req.files,"req.files")
+        const user = res.locals.user.id
+        const imageUpload = await User.findByIdAndUpdate(
+           {_id: user}, 
+           {$set: {image: req.file.path}},
+           {new: true}
+        )
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ error: "error occured while trying to upload image"})
     }
 })
 

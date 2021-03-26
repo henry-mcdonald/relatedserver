@@ -8,6 +8,9 @@ const userSchema = new mongoose.Schema({
     username: {
         type: String
     },
+    image: {
+        type: String, require: true
+    },
     password: {
         type: String
     },
@@ -20,14 +23,6 @@ const userSchema = new mongoose.Schema({
     disability_tags: [{
         type: String
     }],
-    // liked_posts: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Post'
-    // }],
-    // liked_comments: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: 'Comment'
-    // }],
     date: {
         type: Date,
         default: Date.now
