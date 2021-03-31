@@ -229,7 +229,7 @@ router.put('/:postId/edit-post', authLockedRoute, async (req, res)=>{
                         {$set: {title: req.body.title}},
                         {new: true})
                     res.json(updatePostContent)
-
+                    console.log(updatePostContent);
             //if user wants to only change the CONTENT of the post        
             }else if(!req.body.title){
                 console.log("it hit the change content conditional ")
